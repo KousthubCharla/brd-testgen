@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="AI-powered contextual test case generation from Business Requirements Documents. Parse BRDs, crawl apps, generate traceable test cases." />
+  <title>TestGen — BRD to Test Cases | AudicLabs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="brand">
+        <span class="brand-mark">TG</span>
+        <div class="brand-text">
+          <span class="brand-name">TestGen</span>
+          <span class="brand-sub">by AudicLabs</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" role="navigation" aria-label="Main navigation">
+        <div class="nav-group">
+          <span class="nav-group-label">Workspace</span>
+          <button class="nav-item active" data-section="dashboard" id="nav-dashboard">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+            Overview
+          </button>
+        </div>
+        <div class="nav-group">
+          <span class="nav-group-label">Pipeline</span>
+          <button class="nav-item" data-section="brd-upload" id="nav-brd">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 1H3a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V6L9 1z"/><path d="M9 1v5h5"/></svg>
+            A · BRD Upload
+          </button>
+          <button class="nav-item" data-section="crawl-config" id="nav-crawl">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 2a9 9 0 0 1 3 6 9 9 0 0 1-3 6A9 9 0 0 1 5 8a9 9 0 0 1 3-6z"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
+            B · App Crawler
+          </button>
+          <button class="nav-item" data-section="requirements" id="nav-requirements">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2h2a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h2"/><rect x="5" y="1" width="6" height="3" rx="1"/></svg>
+            D · Req Mapping
+          </button>
+          <button class="nav-item" data-section="test-cases" id="nav-testcases">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="6 8 7.5 9.5 11 6"/><rect x="1" y="3" width="14" height="11" rx="1"/><line x1="1" y1="6.5" x2="15" y2="6.5"/></svg>
+            E · Test Cases
+          </button>
+          <button class="nav-item" data-section="traceability" id="nav-rtm">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="5" y1="4" x2="14" y2="4"/><line x1="5" y1="8" x2="14" y2="8"/><line x1="5" y1="12" x2="14" y2="12"/><circle cx="2" cy="4" r="1" fill="currentColor" stroke="none"/><circle cx="2" cy="8" r="1" fill="currentColor" stroke="none"/><circle cx="2" cy="12" r="1" fill="currentColor" stroke="none"/></svg>
+            F · RTM &amp; Gaps
+          </button>
+        </div>
+        <div class="nav-group">
+          <span class="nav-group-label">Output</span>
+          <button class="nav-item" data-section="export" id="nav-export">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11v2a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-2"/><polyline points="5 7 8 10 11 7"/><line x1="8" y1="2" x2="8" y2="10"/></svg>
+            Export
+          </button>
+        </div>
+      </nav>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="cost-tracker" id="cost-tracker">
+        <span class="cost-label">LLM spend</span>
+        <span class="cost-value" id="llm-cost">$0.0000</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════ MAIN ═══════════════════ -->
+  <main class="main-content" id="main-content">
+
+    <!-- ── OVERVIEW / DASHBOARD ── -->
+    <section class="section active" id="section-dashboard">
+      <header class="page-header">
+        <div class="page-header-text">
+          <h2>Overview</h2>
+          <p>AI-powered contextual test case generation from Business Requirements Documents.</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-secondary" id="btn-step-by-step" onclick="document.querySelector('[data-section=brd-upload]').click()">
+            Step-by-step
+          </button>
+          <button class="btn btn-primary" id="btn-run-pipeline">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="4 2 14 8 4 14" fill="currentColor" stroke="none"/></svg>
+            Run Pipeline
+          </button>
+        </div>
+      </header>
+
+      <!-- Stats strip -->
+      <div class="stat-strip" id="dashboard-stats">
+        <div class="stat-item">
+          <span class="stat-value" id="stat-requirements">0</span>
+          <span class="stat-label">Requirements</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value" id="stat-pages">0</span>
+          <span class="stat-label">Pages crawled</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value" id="stat-testcases">0</span>
+          <span class="stat-label">Test cases</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value stat-value--accent" id="stat-coverage">0%</span>
+          <span class="stat-label">RTM coverage</span>
+        </div>
+      </div>
+
+      <!-- Pipeline tracker -->
+      <div class="panel" id="pipeline-card">
+        <div class="panel-header">
+          <span class="panel-title">Pipeline</span>
+        </div>
+        <div class="pipeline-track" id="pipeline-steps">
+          <div class="pipeline-step" data-step="A">
+            <div class="step-node"></div>
+            <div class="step-connector"></div>
+            <div class="step-body">
+              <span class="step-label">A. BRD Understanding</span>
+              <span class="step-status">Pending</span>
+            </div>
+          </div>
+          <div class="pipeline-step" data-step="B">
+            <div class="step-node"></div>
+            <div class="step-connector"></div>
+            <div class="step-body">
+              <span class="step-label">B. Application Exploration</span>
+              <span class="step-status">Pending</span>
+            </div>
+          </div>
+          <div class="pipeline-step" data-step="C">
+            <div class="step-node"></div>
+            <div class="step-connector"></div>
+            <div class="step-body">
+              <span class="step-label">C. Knowledge Model</span>
+              <span class="step-status">Pending</span>
+            </div>
+          </div>
+          <div class="pipeline-step" data-step="D">
+            <div class="step-node"></div>
+            <div class="step-connector"></div>
+            <div class="step-body">
+              <span class="step-label">D. Requirement Mapping</span>
+              <span class="step-status">Pending</span>
+            </div>
+          </div>
+          <div class="pipeline-step" data-step="E">
+            <div class="step-node"></div>
+            <div class="step-connector"></div>
+            <div class="step-body">
+              <span class="step-label">E. Test Case Generation</span>
+              <span class="step-status">Pending</span>
+            </div>
+          </div>
+          <div class="pipeline-step" data-step="F">
+            <div class="step-node"></div>
+            <div class="step-connector" style="display:none"></div>
+            <div class="step-body">
+              <span class="step-label">F. Traceability &amp; Output</span>
+              <span class="step-status">Pending</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── A. BRD UPLOAD ── -->
+    <section class="section" id="section-brd-upload">
+      <header class="page-header">
+        <div class="page-header-text">
+          <h2>BRD Understanding</h2>
+          <p>Parse a Business Requirements Document to extract structured requirements.</p>
+        </div>
+      </header>
+
+      <div class="upload-zone" id="upload-zone">
+        <input type="file" id="brd-file-input" accept=".pdf,.docx,.txt,.md" hidden />
+        <svg class="upload-zone-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M20 27V13M14 19l6-6 6 6"/><path d="M8 28v3a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2v-3"/></svg>
+        <p class="upload-zone-title">Drop your BRD file here</p>
+        <p class="upload-zone-hint">PDF, DOCX, or TXT &nbsp;·&nbsp; up to 50 MB</p>
+        <button class="btn btn-primary" id="btn-browse-brd">Choose file</button>
+      </div>
+
+      <div class="brd-results hidden" id="brd-results">
+        <div class="result-header">
+          <h3 id="brd-title">Parsed Document</h3>
+          <div class="result-badges">
+            <span class="tag" id="brd-req-count">0 requirements</span>
+            <span class="tag tag--warn" id="brd-vague-count">0 vague</span>
+          </div>
+        </div>
+        <div class="infobox" id="brd-summary"></div>
+        <div class="table-wrap">
+          <table class="data-table" id="requirements-table">
+            <thead>
+              <tr><th>ID</th><th>Title</th><th>Module</th><th>Type</th><th>Priority</th><th>Clarity</th></tr>
+            </thead>
+            <tbody id="requirements-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── B. CRAWLER ── -->
+    <section class="section" id="section-crawl-config">
+      <header class="page-header">
+        <div class="page-header-text">
+          <h2>Application Exploration</h2>
+          <p>Configure the crawler to explore the target application per user role.</p>
+        </div>
+      </header>
+
+      <div class="form-panel">
+        <div class="form-section">
+          <label class="field-label" for="crawl-url">Application URL</label>
+          <input type="url" id="crawl-url" class="input" placeholder="https://your-staging-app.example.com" />
+        </div>
+
+        <div class="form-section">
+          <p class="field-label">Role credentials</p>
+          <p class="field-hint">Credentials are used locally by Playwright only — never sent to the LLM.</p>
+          <div id="roles-container" class="roles-list">
+            <div class="role-row" data-role-index="0">
+              <input type="text" class="input role-name" placeholder="Role (e.g. admin)" />
+              <input type="text" class="input role-username" placeholder="Username" />
+              <input type="password" class="input role-password" placeholder="Password" />
+              <button class="btn-remove btn-remove-role" title="Remove">
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="1" y1="1" x2="11" y2="11"/><line x1="11" y1="1" x2="1" y2="11"/></svg>
+              </button>
+            </div>
+          </div>
+          <button class="btn btn-ghost btn-sm" id="btn-add-role">+ Add role</button>
+        </div>
+
+        <div class="form-section">
+          <p class="field-label">Crawl options</p>
+          <div class="field-row-3">
+            <div>
+              <label class="field-sublabel" for="crawl-depth">Max depth</label>
+              <input type="number" id="crawl-depth" class="input" value="5" min="1" max="20" />
+            </div>
+            <div>
+              <label class="field-sublabel" for="crawl-max-pages">Max pages</label>
+              <input type="number" id="crawl-max-pages" class="input" value="100" min="1" max="500" />
+            </div>
+            <div>
+              <label class="field-sublabel" for="crawl-timeout">Timeout (ms)</label>
+              <input type="number" id="crawl-timeout" class="input" value="30000" min="5000" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <label class="field-label" for="crawl-exclude">Exclude URL patterns</label>
+          <input type="text" id="crawl-exclude" class="input" value="logout,delete,remove,payment,destroy" />
+          <p class="field-hint">Comma-separated. Matching URLs are skipped to avoid destructive actions.</p>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-primary" id="btn-start-crawl">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><line x1="2" y1="8" x2="14" y2="8"/><path d="M8 2a9 9 0 0 1 3 6 9 9 0 0 1-3 6A9 9 0 0 1 5 8a9 9 0 0 1 3-6z"/></svg>
+            Start crawling
+          </button>
+          <button class="btn btn-secondary" id="btn-load-model">Load saved model</button>
+        </div>
+      </div>
+
+      <div class="crawl-results hidden" id="crawl-results">
+        <div class="section-divider"><span>Crawl results</span></div>
+        <div class="crawl-stats" id="crawl-stats"></div>
+        <p class="field-label" style="margin:20px 0 8px">Activity log</p>
+        <div class="log-viewer" id="crawl-log"></div>
+      </div>
+    </section>
+
+    <!-- ── D. MAPPING ── -->
+    <section class="section" id="section-requirements">
+      <header class="page-header">
+        <div class="page-header-text">
+          <h2>Requirement Mapping</h2>
+          <p>Link BRD requirements to screens and workflows. Identify gaps in both directions.</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-primary" id="btn-run-mapping">
+            Run mapping
+          </button>
+        </div>
+      </header>
+
+      <div class="mapping-results hidden" id="mapping-results">
+        <div class="mapping-summary" id="mapping-summary"></div>
+        <div class="section-divider"><span>Requirement → Application</span></div>
+        <div class="table-wrap">
+          <table class="data-table" id="mapping-table">
+            <thead>
+              <tr><th>Req ID</th><th>Title</th><th>Mapped to</th><th>Coverage</th><th>Confidence</th></tr>
+            </thead>
+            <tbody id="mapping-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="gap-grid">
+          <div class="gap-panel">
+            <div class="gap-panel-header">
+              <span class="gap-icon gap-icon--warn">!</span>
+              <span>Requirements without features</span>
+            </div>
+            <div id="unmapped-requirements" class="gap-list"></div>
+          </div>
+          <div class="gap-panel">
+            <div class="gap-panel-header">
+              <span class="gap-icon gap-icon--info">?</span>
+              <span>Features without requirements</span>
+            </div>
+            <div id="unmapped-features" class="gap-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── E. TEST CASES ── -->
+    <section class="section" id="section-test-cases">
+      <header class="page-header">
+        <div class="page-header-text">
+          <h2>Test Cases</h2>
+          <p>Contextual test cases generated from requirements and application behaviour.</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-primary" id="btn-generate-tests">
+            Generate test cases
+          </button>
+        </div>
+      </header>
+
+      <div class="toolbar">
+        <div class="filter-group">
+          <select class="input input-sm" id="filter-type">
+            <option value="">All types</option>
+            <option value="positive">Positive</option>
+            <option value="negative">Negative</option>
+            <option value="boundary">Boundary</option>
+            <option value="field-validation">Field validation</option>
+            <option value="role-access">Role access</option>
+            <option value="e2e">End-to-end</option>
+            <option value="business-rule">Business rule</option>
+          </select>
+          <select class="input input-sm" id="filter-priority">
+            <option value="">All priorities</option>
+            <option value="Critical">Critical</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+          <input type="search" class="input input-sm search-input" id="filter-search" placeholder="Search…" />
+        </div>
+      </div>
+
+      <div class="testcases-stats hidden" id="testcases-stats"></div>
+      <div class="testcases-list hidden" id="testcases-list"></div>
+
+      <!-- Modal -->
+      <div class="modal-overlay hidden" id="tc-modal-overlay">
+        <div class="modal" id="tc-modal">
+          <div class="modal-header">
+            <h3 id="tc-modal-title">Test case</h3>
+            <button class="modal-close" id="btn-close-modal" aria-label="Close">
+              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="1" y1="1" x2="13" y2="13"/><line x1="13" y1="1" x2="1" y2="13"/></svg>
+            </button>
+          </div>
+          <div class="modal-body" id="tc-modal-body"></div>
+          <div class="modal-footer">
+            <button class="btn btn-success" id="btn-approve-tc">Approve</button>
+            <button class="btn btn-ghost" id="btn-regenerate-tc">Regenerate</button>
+            <button class="btn btn-secondary" id="btn-close-modal-footer">Close</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── F. RTM ── -->
+    <section class="section" id="section-traceability">
+      <header class="page-header">
+        <div class="page-header-text">
+          <h2>Traceability Matrix</h2>
+          <p>Requirement coverage analysis and gap identification.</p>
+        </div>
+      </header>
+
+      <div class="rtm-content hidden" id="rtm-content">
+        <div class="rtm-summary" id="rtm-summary"></div>
+        <div class="table-wrap" style="margin-top:24px">
+          <table class="data-table" id="rtm-table">
+            <thead>
+              <tr><th>Req ID</th><th>Title</th><th>Module</th><th>Priority</th><th>Mapped pages</th><th># Tests</th><th>Test IDs</th><th>Status</th></tr>
+            </thead>
+            <tbody id="rtm-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="empty-state" id="rtm-no-data">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.25"><rect x="6" y="6" width="36" height="36" rx="3"/><line x1="6" y1="16" x2="42" y2="16"/><line x1="18" y1="6" x2="18" y2="42"/></svg>
+        <p>Run the full pipeline to generate the Requirement Traceability Matrix.</p>
+      </div>
+    </section>
+
+    <!-- ── EXPORT ── -->
+    <section class="section" id="section-export">
+      <header class="page-header">
+        <div class="page-header-text">
+          <h2>Export</h2>
+          <p>Download test cases, RTM, and gap reports in multiple formats.</p>
+        </div>
+      </header>
+
+      <div class="export-list">
+        <div class="export-row" id="export-excel">
+          <div class="export-row-left">
+            <div class="export-fmt-badge">XLSX</div>
+            <div>
+              <p class="export-title">Excel Workbook</p>
+              <p class="export-desc">Test cases, RTM, and gap report across three sheets. Includes conditional formatting and auto-filter.</p>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="app.exportExcel()">Download</button>
+        </div>
+
+        <div class="export-row" id="export-csv">
+          <div class="export-row-left">
+            <div class="export-fmt-badge export-fmt-badge--csv">CSV</div>
+            <div>
+              <p class="export-title">CSV File</p>
+              <p class="export-desc">Flat test case table for import into spreadsheets or test management tools.</p>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="app.exportCSV()">Download</button>
+        </div>
+
+        <div class="export-row" id="export-json">
+          <div class="export-row-left">
+            <div class="export-fmt-badge export-fmt-badge--json">JSON</div>
+            <div>
+              <p class="export-title">JSON Bundle</p>
+              <p class="export-desc">Complete data — BRD parse, knowledge model, test cases, and RTM — for API or tool integration.</p>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="app.exportJSON()">Download</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ═══ LOADING OVERLAY ═══ -->
+  <div class="loading-overlay hidden" id="loading-overlay">
+    <div class="loading-box">
+      <div class="loading-spinner"></div>
+      <p class="loading-text" id="loader-text">Processing…</p>
+    </div>
+  </div>
+
+  <!-- ═══ TOAST ═══ -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

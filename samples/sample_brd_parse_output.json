@@ -1,0 +1,96 @@
+{
+  "id": "brd-sample-001",
+  "fileName": "sample-brd.pdf",
+  "title": "User Management System — Business Requirements Document",
+  "summary": "This BRD defines requirements for a user management system enabling admin, manager, and end-user roles to manage accounts, permissions, and audit logs.",
+  "actors": ["Admin", "Manager", "End User"],
+  "modules": ["Authentication", "User Management", "Reporting", "Settings"],
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "title": "User Login with Username and Password",
+      "description": "The system shall allow registered users to log in using their username and password. The system must validate credentials against the database and grant role-based access upon success.",
+      "module": "Authentication",
+      "type": "functional",
+      "priority": "Critical",
+      "acceptance_criteria": [
+        "User can log in with valid credentials",
+        "System rejects invalid credentials with error message",
+        "User is redirected to role-specific dashboard after login"
+      ],
+      "actors": ["Admin", "Manager", "End User"],
+      "is_vague": false,
+      "vague_reason": null
+    },
+    {
+      "id": "REQ-002",
+      "title": "Admin Can Create New User Accounts",
+      "description": "Admin users shall be able to create new user accounts by providing full name, email address, role, and an initial password. The system must send a welcome email upon account creation.",
+      "module": "User Management",
+      "type": "functional",
+      "priority": "High",
+      "acceptance_criteria": [
+        "Admin can navigate to Users > Add User",
+        "Form accepts: Full Name, Email, Role, Password",
+        "Email field must be unique",
+        "Welcome email is sent on success"
+      ],
+      "actors": ["Admin"],
+      "is_vague": false,
+      "vague_reason": null
+    },
+    {
+      "id": "REQ-003",
+      "title": "Password Must Meet Complexity Requirements",
+      "description": "Passwords must be at least 8 characters, contain at least one uppercase letter, one number, and one special character.",
+      "module": "Authentication",
+      "type": "validation",
+      "priority": "High",
+      "acceptance_criteria": [
+        "Minimum 8 characters enforced",
+        "At least 1 uppercase letter required",
+        "At least 1 numeric character required",
+        "At least 1 special character required",
+        "Error message shown for non-compliant passwords"
+      ],
+      "actors": ["Admin", "Manager", "End User"],
+      "is_vague": false,
+      "vague_reason": null
+    },
+    {
+      "id": "REQ-004",
+      "title": "Manager Can View Audit Logs",
+      "description": "Managers shall have read-only access to the audit log showing all actions performed in the system.",
+      "module": "Reporting",
+      "type": "functional",
+      "priority": "Medium",
+      "acceptance_criteria": [
+        "Audit log is accessible from Reports > Audit Log",
+        "Displays: user, action, timestamp",
+        "Manager cannot modify audit log entries"
+      ],
+      "actors": ["Manager"],
+      "is_vague": false,
+      "vague_reason": null
+    },
+    {
+      "id": "REQ-005",
+      "title": "System Should Notify Users",
+      "description": "The system should notify users when important events happen.",
+      "module": "Settings",
+      "type": "functional",
+      "priority": "Low",
+      "acceptance_criteria": [],
+      "actors": ["Admin", "Manager", "End User"],
+      "is_vague": true,
+      "vague_reason": "Requirement is vague: it does not specify which events trigger notifications, what channels (email, in-app, SMS) are used, or what the notification content should be."
+    }
+  ],
+  "stats": {
+    "totalRequirements": 5,
+    "vagueRequirements": 1,
+    "clearRequirements": 4,
+    "parseTimeMs": 3240
+  },
+  "parsedAt": "2026-10-25T10:00:00.000Z"
+}

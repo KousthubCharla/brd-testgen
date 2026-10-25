@@ -1,0 +1,94 @@
+{
+  "rtm": [
+    {
+      "requirement_id": "REQ-001",
+      "requirement_title": "User Login with Username and Password",
+      "requirement_module": "Authentication",
+      "requirement_priority": "Critical",
+      "is_vague": false,
+      "mapped_pages": "Login Page",
+      "coverage_status": "full",
+      "test_case_count": 2,
+      "test_case_ids": "TC-001, TC-002",
+      "test_types_covered": "positive, negative",
+      "status": "Covered"
+    },
+    {
+      "requirement_id": "REQ-002",
+      "requirement_title": "Admin Can Create New User Accounts",
+      "requirement_module": "User Management",
+      "requirement_priority": "High",
+      "is_vague": false,
+      "mapped_pages": "User Management > Add User",
+      "coverage_status": "full",
+      "test_case_count": 1,
+      "test_case_ids": "TC-004",
+      "test_types_covered": "positive",
+      "status": "Covered"
+    },
+    {
+      "requirement_id": "REQ-003",
+      "requirement_title": "Password Must Meet Complexity Requirements",
+      "requirement_module": "Authentication",
+      "requirement_priority": "High",
+      "is_vague": false,
+      "mapped_pages": "Login Page; Add User Form",
+      "coverage_status": "full",
+      "test_case_count": 1,
+      "test_case_ids": "TC-003",
+      "test_types_covered": "boundary",
+      "status": "Covered"
+    },
+    {
+      "requirement_id": "REQ-004",
+      "requirement_title": "Manager Can View Audit Logs",
+      "requirement_module": "Reporting",
+      "requirement_priority": "Medium",
+      "is_vague": false,
+      "mapped_pages": "Reports > Audit Log",
+      "coverage_status": "full",
+      "test_case_count": 1,
+      "test_case_ids": "TC-005",
+      "test_types_covered": "role-access",
+      "status": "Covered"
+    },
+    {
+      "requirement_id": "REQ-005",
+      "requirement_title": "System Should Notify Users",
+      "requirement_module": "Settings",
+      "requirement_priority": "Low",
+      "is_vague": true,
+      "mapped_pages": "N/A",
+      "coverage_status": "none",
+      "test_case_count": 0,
+      "test_case_ids": "",
+      "test_types_covered": "",
+      "status": "Not Covered"
+    }
+  ],
+  "summary": {
+    "total_requirements": 5,
+    "covered": 4,
+    "not_covered": 1,
+    "coverage_percent": 80,
+    "total_test_cases": 5,
+    "vague_requirements": 1
+  },
+  "gap_report": {
+    "unmapped_requirements": [
+      {
+        "requirement_id": "REQ-005",
+        "requirement_title": "System Should Notify Users",
+        "reason": "Requirement is too vague to map to a specific application feature. No notification settings found in the crawled application."
+      }
+    ],
+    "unmapped_features": [
+      {
+        "page_url": "https://staging.app.example.com/settings/profile",
+        "page_title": "Profile Settings",
+        "feature_description": "User profile editing form with avatar upload, bio, and phone number fields",
+        "reason": "Feature exists in app but not mentioned in any BRD requirement"
+      }
+    ]
+  }
+}

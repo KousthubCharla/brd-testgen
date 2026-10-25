@@ -1,0 +1,134 @@
+[
+  {
+    "test_case_id": "TC-001",
+    "requirement_id": "REQ-001",
+    "module": "Authentication",
+    "title": "Verify successful login with valid admin credentials",
+    "preconditions": [
+      "Application is running on the staging URL",
+      "Admin account exists with username: admin@example.com"
+    ],
+    "test_steps": [
+      "1. Open the application at https://staging.app.example.com",
+      "2. Observe the Login page with 'Email' and 'Password' fields",
+      "3. Enter 'admin@example.com' in the 'Email' field",
+      "4. Enter 'Admin@1234' in the 'Password' field",
+      "5. Click the 'Log In' button"
+    ],
+    "test_data": {
+      "email": "admin@example.com",
+      "password": "Admin@1234"
+    },
+    "expected_result": "Admin is redirected to the Admin Dashboard. The navigation sidebar shows 'User Management', 'Reports', and 'Settings' menu items.",
+    "priority": "Critical",
+    "test_type": "positive",
+    "role": "admin",
+    "status": "approved"
+  },
+  {
+    "test_case_id": "TC-002",
+    "requirement_id": "REQ-001",
+    "module": "Authentication",
+    "title": "Verify login fails with incorrect password",
+    "preconditions": [
+      "Application is running",
+      "Admin account exists"
+    ],
+    "test_steps": [
+      "1. Navigate to the Login page",
+      "2. Enter 'admin@example.com' in the 'Email' field",
+      "3. Enter 'WrongPassword!' in the 'Password' field",
+      "4. Click the 'Log In' button"
+    ],
+    "test_data": {
+      "email": "admin@example.com",
+      "password": "WrongPassword!"
+    },
+    "expected_result": "Login fails. Error message 'Invalid email or password. Please try again.' is displayed. User remains on the Login page.",
+    "priority": "Critical",
+    "test_type": "negative",
+    "role": "admin",
+    "status": "draft"
+  },
+  {
+    "test_case_id": "TC-003",
+    "requirement_id": "REQ-003",
+    "module": "Authentication",
+    "title": "Verify password field rejects passwords shorter than 8 characters",
+    "preconditions": [
+      "Admin is on the 'Add User' or 'Change Password' form"
+    ],
+    "test_steps": [
+      "1. Navigate to User Management > Add User",
+      "2. Fill in 'Full Name': 'Test User'",
+      "3. Fill in 'Email': 'test@example.com'",
+      "4. Enter 'Ab1!' in the 'Password' field (4 characters — below minimum)",
+      "5. Click 'Save User' button"
+    ],
+    "test_data": {
+      "full_name": "Test User",
+      "email": "test@example.com",
+      "password": "Ab1!"
+    },
+    "expected_result": "Form submission is blocked. Inline error message displayed: 'Password must be at least 8 characters long.'",
+    "priority": "High",
+    "test_type": "boundary",
+    "role": "admin",
+    "status": "draft"
+  },
+  {
+    "test_case_id": "TC-004",
+    "requirement_id": "REQ-002",
+    "module": "User Management",
+    "title": "Verify admin can create a new manager account with all valid data",
+    "preconditions": [
+      "Admin is logged in",
+      "Navigate to User Management > Users"
+    ],
+    "test_steps": [
+      "1. Click 'Add User' button on the Users page",
+      "2. Enter 'Jane Smith' in the 'Full Name' field",
+      "3. Enter 'jane.smith@example.com' in the 'Email' field",
+      "4. Select 'Manager' from the 'Role' dropdown",
+      "5. Enter 'Manager@5678' in the 'Password' field",
+      "6. Click 'Save User' button"
+    ],
+    "test_data": {
+      "full_name": "Jane Smith",
+      "email": "jane.smith@example.com",
+      "role": "Manager",
+      "password": "Manager@5678"
+    },
+    "expected_result": "Success message shown: 'User created successfully'. New user 'Jane Smith' appears in the Users list with role 'Manager'. A welcome email is sent to jane.smith@example.com.",
+    "priority": "High",
+    "test_type": "positive",
+    "role": "admin",
+    "status": "draft"
+  },
+  {
+    "test_case_id": "TC-005",
+    "requirement_id": "REQ-004",
+    "module": "Reporting",
+    "title": "Verify manager cannot edit audit log entries",
+    "preconditions": [
+      "Manager is logged in",
+      "Navigate to Reports > Audit Log"
+    ],
+    "test_steps": [
+      "1. Log in as Manager",
+      "2. Click 'Reports' in the left navigation",
+      "3. Click 'Audit Log' sub-menu item",
+      "4. Observe the audit log table with columns: User, Action, Timestamp",
+      "5. Attempt to click on any audit log row to edit it"
+    ],
+    "test_data": {
+      "role": "manager",
+      "username": "manager@example.com"
+    },
+    "expected_result": "Audit log is displayed in read-only mode. No 'Edit' or 'Delete' buttons are visible. Clicking a row shows details but no editable fields.",
+    "priority": "High",
+    "test_type": "role-access",
+    "role": "manager",
+    "status": "draft"
+  }
+]

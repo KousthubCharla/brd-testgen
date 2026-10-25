@@ -1,0 +1,27 @@
+# ── Dependencies ─────────────────────────────────────────────────
+node_modules/
+
+# ── Environment / Secrets (NEVER commit these) ───────────────────
+.env
+*.env
+.env.local
+.env.*.local
+
+# ── Runtime-generated folders (recreated on startup) ─────────────
+output/
+logs/
+uploads/
+data/knowledge/
+docs/
+screenshots/
+
+# ── OS / Editor ───────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/settings.json
+.idea/
+
+# ── Build ─────────────────────────────────────────────────────────
+dist/
